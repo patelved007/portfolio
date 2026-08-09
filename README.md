@@ -26,6 +26,35 @@ Personal portfolio application built with React and Vite.
 
 No API key is required for public GitHub user repositories.
 
+## Practical 4 - Task Manager API (Backend)
+
+Separate Express backend in `task-manager-api-24IT080/`:
+
+- REST CRUD endpoints: GET, POST, PUT, DELETE `/tasks`
+- Logging middleware, Content-Type validation, ID validation
+- 404 handler for undefined routes and global error handler
+
+## Practical 5 - MongoDB Integration
+
+Updated `task-manager-api-24IT080/` with:
+
+- MongoDB connection using Mongoose and `.env` (`MONGO_URI`)
+- Task schema: title, description, completed, createdAt, priority
+- In-memory storage replaced with database CRUD
+- `GET /tasks/:id` with 404 handling
+- Structured validation error responses
+
+See `task-manager-api-24IT080/README.md` for setup and Postman testing.
+
+## Assignment W4 – Richardson Maturity Model
+
+Folder: `assignment-w4-24IT080/`
+
+- `MATURITY.md` – Level 0–3 evaluation table, HATEOAS example, reflection
+- `server.js` – API evaluated at **Level 2** (POST returns `Location` header on 201)
+
+Push `assignment-w4-24IT080` to GitHub as `assignment-w4-24IT080` for submission.
+
 ## Features
 
 - React Router v6 for client-side navigation

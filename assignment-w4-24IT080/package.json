@@ -1,0 +1,12 @@
+{
+  "name": "assignment-w4-24it080",
+  "version": "1.0.0",
+  "description": "Week 4 assignment - Richardson Maturity Model evaluation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

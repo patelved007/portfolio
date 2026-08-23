@@ -46,6 +46,38 @@ Updated `task-manager-api-24IT080/` with:
 
 See `task-manager-api-24IT080/README.md` for setup and Postman testing.
 
+## Practical 6 - Full Stack Integration
+
+The React UI now talks to the Express + MongoDB backend.
+
+- CORS enabled on the backend (`app.use(cors())`)
+- Shared frontend API file: `src/api.js` (`http://localhost:5000`)
+- Tasks page (`/projects`) replaces the GitHub repo list with live `/tasks` CRUD
+- Create, view, update, and delete tasks from the UI
+- Loading and error handling on every API call
+- Delete confirmation dialog
+- Toast message after successful create, update, and delete
+
+### Run both servers
+
+Terminal 1 (backend):
+
+```bash
+cd task-manager-api-24IT080
+npm install
+copy .env.example .env
+npm start
+```
+
+Terminal 2 (frontend):
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`, go to **Tasks**, then create / update / delete a task. Refresh the browser to confirm data stays in MongoDB.
+
 ## Assignment W4 – Richardson Maturity Model
 
 Folder: `assignment-w4-24IT080/`

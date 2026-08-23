@@ -12,7 +12,7 @@ function Spinner() {
           animation: "spin 0.8s linear infinite",
         }}
       />
-      <p>Loading repositories...</p>
+      <p>Loading...</p>
     </div>
   );
 }

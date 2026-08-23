@@ -30,6 +30,14 @@ For **MongoDB Atlas**, replace with your Atlas connection string.
 npm start
 ```
 
+CORS is enabled so the React app at `http://localhost:5173` can call this API.
+
+## Run with the React frontend
+
+1. Start this API on port 5000
+2. In the portfolio folder, run `npm run dev`
+3. Open Tasks in the browser and use Create / Update / Delete
+
 ## Task Schema
 
 | Field | Type | Rules |

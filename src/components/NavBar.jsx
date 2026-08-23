@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 function NavBar({ darkMode, onToggleTheme }) {
+  const token = localStorage.getItem("token");
+
   return (
     <nav
       style={{
@@ -17,10 +19,13 @@ function NavBar({ darkMode, onToggleTheme }) {
         Home
       </Link>
       <Link to="/projects" style={linkStyle}>
-        Projects
+        Tasks
       </Link>
       <Link to="/contact" style={linkStyle}>
         Contact
+      </Link>
+      <Link to="/login" style={linkStyle}>
+        {token ? "Account / Logout" : "Login"}
       </Link>
       <button type="button" onClick={onToggleTheme} style={buttonStyle}>
         {darkMode ? "Light Mode" : "Dark Mode"}

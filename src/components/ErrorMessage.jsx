@@ -11,7 +11,7 @@ function ErrorMessage({ message, onRetry }) {
       }}
     >
       <p style={{ margin: "0 0 12px", color: "#991b1b" }}>
-        Failed to load repositories: {message}
+        Error: {message}
       </p>
       {onRetry && (
         <button type="button" onClick={onRetry} style={buttonStyle}>

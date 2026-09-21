@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 pdf_text7.txt
+pdf_text8.txt
 .env
+
 

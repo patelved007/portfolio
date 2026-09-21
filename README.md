@@ -1,103 +1,91 @@
-# Ved Portfolio
+# Portfolio & Task Management Application
 
-Personal portfolio application built with React and Vite.
+Advanced Web Development Frameworks (ITUE301) — **Practical 8: Performance Optimization and Lazy Loading in React**
 
-## Practical 1
+Author: **Ved Patel (24IT080)**
 
-- Reusable components: Header, About, Skills, Footer
-- Props used to pass data between components
+---
 
-## Practical 2 - Routes Added
+## Project Structure
 
-- `/` - Home (Header, About, Skills)
-- `/projects` - Projects page
-- `/contact` - Contact form with controlled input and useState
-- `*` - 404 Not Found page
+The codebase is structured into `frontend` and `backend` directories:
 
-## Practical 3 - API Integration
+```
+portfolio/
+├── frontend/                 # React 18 + Vite frontend application
+│   ├── src/
+│   │   ├── components/       # Pages & UI components (Projects, Contact, Login, etc.)
+│   │   ├── api.js            # Task & Auth API client with JWT header injection
+│   │   ├── App.jsx           # Route container with React.lazy & Suspense code splitting
+│   │   ├── index.css         # Modern glassmorphism theme & dark/light mode styles
+│   │   └── main.jsx          # Entry point
+│   ├── package.json
+│   └── vite.config.js
+│
+├── backend/                  # Node.js + Express + MongoDB REST API
+│   ├── models/               # Mongoose schemas (Task.js, User.js)
+│   ├── middleware/           # Auth (JWT) & validation middleware
+│   ├── server.js             # Express API server (Auth, Tasks CRUD)
+│   └── package.json
+│
+└── README.md
+```
 
-- Projects page fetches repositories from the [GitHub REST API](https://docs.github.com/en/rest)
-- API URL: `https://api.github.com/users/patelved007/repos`
-- `useEffect` runs the fetch when the page loads
-- `useState` for `repos`, `loading`, and `error`
-- `Spinner` while loading, `ErrorMessage` with retry on failure
-- `RepoList` shows repository name, URL, and star count
-- Search input filters repositories by name
+---
 
-No API key is required for public GitHub user repositories.
+## Practical 8: Performance Optimization Metrics
 
-## Practical 4 - Task Manager API (Backend)
+### Architecture & Code Splitting
+Route-based code splitting was implemented using `React.lazy()` and `<Suspense fallback={<PageLoader />}>`:
 
-Separate Express backend in `task-manager-api-24IT080/`:
+```jsx
+const Projects = lazy(() => import("./components/Projects"));
+const Contact = lazy(() => import("./components/Contact"));
+const Login = lazy(() => import("./components/Login"));
+```
 
-- REST CRUD endpoints: GET, POST, PUT, DELETE `/tasks`
-- Logging middleware, Content-Type validation, ID validation
-- 404 handler for undefined routes and global error handler
+### Bundle Size & Build Comparison
 
-## Practical 5 - MongoDB Integration
+| Metric | Before Lazy Loading (Single Bundle) | After Practical 8 (Code-Split Chunks) | Optimization Gain |
+| :--- | :--- | :--- | :--- |
+| **Initial JS Bundle** | `244.01 kB` (gzip: `77.64 kB`) | `235.35 kB` (gzip: `75.55 kB`) | **~8.66 kB smaller initial load** |
+| **`Projects.chunk.js`** | Included upfront | `4.30 kB` (gzip: `1.64 kB`) | Deferred until `/projects` route visited |
+| **`Login.chunk.js`** | Included upfront | `2.61 kB` (gzip: `1.13 kB`) | Deferred until `/login` route visited |
+| **`Contact.chunk.js`** | Included upfront | `1.13 kB` (gzip: `0.61 kB`) | Deferred until `/contact` route visited |
 
-Updated `task-manager-api-24IT080/` with:
+### Performance Impact:
+- **Faster Initial Load**: Users landing on the home page download only core app code. Route-specific code (`Projects`, `Login`, `Contact`) is fetched on-demand.
+- **Graceful Fallback UI**: Integrated `<PageLoader />` spinner renders during chunk retrieval on slower connections (e.g. Slow 3G throttling).
 
-- MongoDB connection using Mongoose and `.env` (`MONGO_URI`)
-- Task schema: title, description, completed, createdAt, priority
-- In-memory storage replaced with database CRUD
-- `GET /tasks/:id` with 404 handling
-- Structured validation error responses
+---
 
-See `task-manager-api-24IT080/README.md` for setup and Postman testing.
+## How to Run locally
 
-## Practical 6 - Full Stack Integration
-
-The React UI now talks to the Express + MongoDB backend.
-
-- CORS enabled on the backend (`app.use(cors())`)
-- Shared frontend API file: `src/api.js` (`http://localhost:5000`)
-- Tasks page (`/projects`) replaces the GitHub repo list with live `/tasks` CRUD
-- Create, view, update, and delete tasks from the UI
-- Loading and error handling on every API call
-- Delete confirmation dialog
-- Toast message after successful create, update, and delete
-
-### Run both servers
-
-Terminal 1 (backend):
-
+### 1. Backend Server
 ```bash
-cd task-manager-api-24IT080
+cd backend
 npm install
-copy .env.example .env
 npm start
 ```
+> Server runs on `http://localhost:5000` connected to MongoDB.
 
-Terminal 2 (frontend):
-
+### 2. Frontend Application
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
+> Application runs on `http://localhost:5173`.
 
-Open `http://localhost:5173`, go to **Tasks**, then create / update / delete a task. Refresh the browser to confirm data stays in MongoDB.
+---
 
-## Assignment W4 – Richardson Maturity Model
+## Practical Progression History
 
-Folder: `assignment-w4-24IT080/`
-
-- `MATURITY.md` – Level 0–3 evaluation table, HATEOAS example, reflection
-- `server.js` – API evaluated at **Level 2** (POST returns `Location` header on 201)
-
-Push `assignment-w4-24IT080` to GitHub as `assignment-w4-24IT080` for submission.
-
-## Features
-
-- React Router v6 for client-side navigation
-- NavBar with `Link` components (no full page reload)
-- `useState` for contact form input and help tooltip toggle
-- Live character count on the contact form
-- Dark/light mode toggle
-
-## Run the App
-
-```bash
-npm install
-npm run dev
-```
+1. **Practical 1**: Reusable UI Components & State Management
+2. **Practical 2**: React Router SPA Navigation
+3. **Practical 3**: API Integration & Asynchronous State
+4. **Practical 4**: Express.js REST API with CRUD Operations
+5. **Practical 5**: MongoDB & Mongoose Schema Integration
+6. **Practical 6**: Full-Stack Task Management Integration
+7. **Practical 7**: JWT Authentication & Server-Side Input Validation Pipeline
+8. **Practical 8**: Performance Optimization & Lazy Loading in React

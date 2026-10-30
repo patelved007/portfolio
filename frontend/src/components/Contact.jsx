@@ -5,39 +5,41 @@ function Contact() {
   const [showHelp, setShowHelp] = useState(false);
 
   return (
-    <section className="panel" style={{ maxWidth: 640, margin: "0 auto" }}>
+    <section className="panel contact-panel">
       <p className="eyebrow">Contact</p>
       <h2 className="section-title">Say hello</h2>
-      <p className="lede">Send a message using the form below.</p>
+      <p className="lede">Write a short note. The preview updates as you type.</p>
 
-      <button
-        type="button"
-        className="btn btn--ghost"
-        onClick={() => setShowHelp(!showHelp)}
-        style={{ margin: "16px 0" }}
-      >
-        {showHelp ? "Hide Help" : "Show Help"}
-      </button>
+      <div className="actions" style={{ margin: "16px 0" }}>
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={() => setShowHelp(!showHelp)}
+        >
+          {showHelp ? "Hide help" : "Show help"}
+        </button>
+      </div>
 
       {showHelp && (
         <p className="help-box">
-          Type your message in the box below. Your input is shown in real time.
+          Type below. Character count and live preview are shown instantly.
         </p>
       )}
 
-      <label htmlFor="message">Your Message</label>
+      <label htmlFor="message">Your message</label>
       <textarea
         id="message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        rows={5}
+        rows={6}
+        placeholder="Hello Ved..."
       />
 
-      <p className="meta">Character count: {message.length}</p>
+      <p className="meta">{message.length} characters</p>
 
       {message && (
         <div className="preview-box">
-          <strong>Live Preview</strong>
+          <strong>Live preview</strong>
           <p>{message}</p>
         </div>
       )}

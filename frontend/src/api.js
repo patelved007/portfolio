@@ -43,6 +43,13 @@ export const getMe = () =>
     },
   }).then(handleResponse);
 
+export const getCacheStats = () =>
+  fetch(`${BASE_URL}/cache-stats`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  }).then(handleResponse);
+
 export const getTasks = () =>
   fetch(`${BASE_URL}/tasks`, {
     headers: {
@@ -77,3 +84,14 @@ export const deleteTask = (id) =>
       ...getAuthHeaders(),
     },
   }).then(handleResponse);
+
+export const generateAiDescription = (title) =>
+  fetch(`${BASE_URL}/api/ai/generate-description`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ title }),
+  }).then(handleResponse);
+

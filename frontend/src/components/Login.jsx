@@ -68,9 +68,14 @@ function Login() {
   };
 
   return (
-    <section className="panel" style={{ maxWidth: 520, margin: "0 auto" }}>
+    <section className="panel auth-panel">
       <p className="eyebrow">Account</p>
-      <h2 className="section-title">Authentication</h2>
+      <h2 className="section-title">{token && user ? "You are in" : isRegistering ? "Create account" : "Welcome back"}</h2>
+      <p className="lede">
+        {token && user
+          ? "JWT is stored in the browser and sent with every task request."
+          : "Register or log in to access protected task routes."}
+      </p>
 
       {error && <ErrorMessage message={error} />}
 

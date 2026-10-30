@@ -1,6 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getTasks, createTask, updateTask, deleteTask } from "../api";
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+  getCacheStats,
+  generateAiDescription,
+} from "../api";
 import Spinner from "./Spinner";
 import ErrorMessage from "./ErrorMessage";
 import Toast from "./Toast";
@@ -12,15 +19,25 @@ function Projects() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiDisclaimer, setAiDisclaimer] = useState("");
   const [toast, setToast] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
   const [editingId, setEditingId] = useState(null);
+  const [cacheStats, setCacheStats] = useState(null);
+
 
   const showToast = (message) => {
     setToast(message);
     setTimeout(() => setToast(""), 2500);
+  };
+
+  const loadCacheStats = () => {
+    getCacheStats()
+      .then(setCacheStats)
+      .catch(() => setCacheStats(null));
   };
 
   const fetchTasks = () => {
@@ -28,7 +45,10 @@ function Projects() {
     setError(null);
 
     getTasks()
-      .then((data) => setTasks(data))
+      .then((data) => {
+        setTasks(data);
+        loadCacheStats();
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
@@ -42,7 +62,41 @@ function Projects() {
     setDescription("");
     setPriority("medium");
     setEditingId(null);
+    setAiDisclaimer("");
   };
+
+  const handleGenerateAiDescription = () => {
+    if (!title.trim()) {
+      showToast("Please enter a task title first!");
+      return;
+    }
+
+    setAiLoading(true);
+    setAiDisclaimer("");
+
+    generateAiDescription(title)
+      .then((res) => {
+        if (res.description) {
+          setDescription(res.description);
+        }
+        if (res.suggestedPriority) {
+          setPriority(res.suggestedPriority);
+        }
+        if (res.disclaimer) {
+          setAiDisclaimer(res.disclaimer);
+        }
+        showToast(
+          res.fallback
+            ? "AI suggestion generated (offline template)"
+            : "AI description generated!"
+        );
+      })
+      .catch((err) => {
+        showToast("AI suggestion error: " + err.message);
+      })
+      .finally(() => setAiLoading(false));
+  };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,11 +110,14 @@ function Projects() {
 
     request
       .then(() => {
-        showToast(editingId ? "Task updated successfully" : "Task created successfully");
+        showToast(editingId ? "Task updated" : "Task created");
         resetForm();
         return getTasks();
       })
-      .then((data) => setTasks(data))
+      .then((data) => {
+        setTasks(data);
+        loadCacheStats();
+      })
       .catch((err) => setError(err.message))
       .finally(() => setActionLoading(false));
   };
@@ -71,10 +128,13 @@ function Projects() {
 
     updateTask(task._id, { completed: !task.completed })
       .then(() => {
-        showToast("Task updated successfully");
+        showToast("Task updated");
         return getTasks();
       })
-      .then((data) => setTasks(data))
+      .then((data) => {
+        setTasks(data);
+        loadCacheStats();
+      })
       .catch((err) => setError(err.message))
       .finally(() => setActionLoading(false));
   };
@@ -87,7 +147,7 @@ function Projects() {
   };
 
   const handleDelete = (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this task?");
+    const confirmed = window.confirm("Delete this task?");
     if (!confirmed) {
       return;
     }
@@ -97,13 +157,16 @@ function Projects() {
 
     deleteTask(id)
       .then(() => {
-        showToast("Task deleted successfully");
+        showToast("Task deleted");
         if (editingId === id) {
           resetForm();
         }
         return getTasks();
       })
-      .then((data) => setTasks(data))
+      .then((data) => {
+        setTasks(data);
+        loadCacheStats();
+      })
       .catch((err) => setError(err.message))
       .finally(() => setActionLoading(false));
   };
@@ -112,19 +175,36 @@ function Projects() {
     return <Spinner />;
   }
 
+  const needsLogin =
+    error &&
+    (error.toLowerCase().includes("denied") ||
+      error.toLowerCase().includes("unauthorized") ||
+      error.toLowerCase().includes("token") ||
+      error.toLowerCase().includes("log in"));
+
   return (
     <section>
-      <p className="eyebrow">Workspace</p>
-      <h2 className="section-title">Tasks</h2>
+      <div className="page-head">
+        <div>
+          <p className="eyebrow">Workspace</p>
+          <h2 className="section-title">Tasks</h2>
+          <p className="lede">Create, update, and delete tasks stored in MongoDB.</p>
+        </div>
+        {cacheStats && (
+          <div className="cache-chip">
+            <span>Cache</span>
+            <strong>{cacheStats.hits} hits</strong>
+            <em>{cacheStats.misses} misses</em>
+          </div>
+        )}
+      </div>
 
       {error && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="banner">
           <ErrorMessage message={error} onRetry={fetchTasks} />
-          {(error.toLowerCase().includes("denied") ||
-            error.toLowerCase().includes("unauthorized") ||
-            error.toLowerCase().includes("token")) && (
+          {needsLogin && (
             <p className="lede">
-              Please <Link to="/login">log in</Link> to view and manage tasks.
+              Please <Link to="/login">log in</Link> to manage tasks.
             </p>
           )}
         </div>
@@ -136,21 +216,61 @@ function Projects() {
 
       <div className="grid-2">
         <form className="panel" onSubmit={handleSubmit}>
-          <h3>{editingId ? "Update task" : "Create task"}</h3>
+          <h3>{editingId ? "Update task" : "New task"}</h3>
           <label htmlFor="title">Title</label>
           <input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="What needs to be done?"
             required
           />
 
-          <label htmlFor="description">Description</label>
-          <input
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "6px",
+            }}
+          >
+            <label htmlFor="description" style={{ margin: 0 }}>
+              Description
+            </label>
+            <button
+              type="button"
+              className="btn btn--ghost"
+              style={{
+                fontSize: "12px",
+                padding: "3px 8px",
+                borderRadius: "8px",
+              }}
+              disabled={aiLoading || !title.trim()}
+              onClick={handleGenerateAiDescription}
+            >
+              {aiLoading ? "✨ Generating..." : "✨ Generate with AI"}
+            </button>
+          </div>
+          <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="Optional notes or click 'Generate with AI'"
           />
+          {aiDisclaimer && (
+            <p
+              style={{
+                fontSize: "11px",
+                color: "var(--muted)",
+                marginTop: "-10px",
+                marginBottom: "12px",
+              }}
+            >
+              💡 {aiDisclaimer}
+            </p>
+          )}
+
 
           <label htmlFor="priority">Priority</label>
           <select
@@ -158,14 +278,14 @@ function Projects() {
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
           >
-            <option value="low">low</option>
-            <option value="medium">medium</option>
-            <option value="high">high</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
           </select>
 
           <div className="actions">
             <button type="submit" className="btn" disabled={actionLoading}>
-              {actionLoading ? "Saving..." : editingId ? "Update Task" : "Add Task"}
+              {actionLoading ? "Saving..." : editingId ? "Save changes" : "Add task"}
             </button>
             {editingId && (
               <button type="button" className="btn btn--ghost" onClick={resetForm}>
@@ -177,16 +297,23 @@ function Projects() {
 
         <div>
           {tasks.length === 0 ? (
-            <p className="lede">No tasks yet. Add one using the form.</p>
+            <div className="empty-state panel">
+              <p className="eyebrow">Empty</p>
+              <h3>No tasks yet</h3>
+              <p className="lede">Add one on the left. Data stays in MongoDB after refresh.</p>
+            </div>
           ) : (
             <ul className="task-list">
               {tasks.map((task) => (
                 <li key={task._id} className={task.completed ? "task-card is-done" : "task-card"}>
-                  <h3>{task.title}</h3>
+                  <div className="task-card__top">
+                    <h3>{task.title}</h3>
+                    <span className={`badge badge--${task.priority || "medium"}`}>
+                      {task.priority || "medium"}
+                    </span>
+                  </div>
                   <p>{task.description || "No description"}</p>
-                  <p className="meta">
-                    Priority: {task.priority} · Completed: {task.completed ? "Yes" : "No"}
-                  </p>
+                  <p className="meta">{task.completed ? "Completed" : "Open"}</p>
                   <div className="actions">
                     <button
                       type="button"
@@ -194,7 +321,7 @@ function Projects() {
                       onClick={() => handleToggleComplete(task)}
                       disabled={actionLoading}
                     >
-                      {task.completed ? "Mark Incomplete" : "Mark Complete"}
+                      {task.completed ? "Reopen" : "Complete"}
                     </button>
                     <button
                       type="button"

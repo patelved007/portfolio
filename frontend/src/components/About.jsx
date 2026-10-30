@@ -2,10 +2,11 @@ function About() {
   return (
     <section className="panel">
       <p className="eyebrow">About</p>
-      <h2 className="section-title">Building in public</h2>
+      <h2 className="section-title">What this site is</h2>
       <p className="lede">
-        I am learning React and building reusable components, then wiring them
-        to a Node and MongoDB backend so the work feels like a real product.
+        A semester portfolio built step by step: components, routing, APIs,
+        MongoDB, authentication, lazy loading, and caching. Each lab adds one
+        real feature instead of a demo-only page.
       </p>
     </section>
   );

@@ -1,6 +1,8 @@
 # Portfolio & Task Management Application
 
-Advanced Web Development Frameworks (ITUE301) — **Practical 8: Performance Optimization and Lazy Loading in React**
+![CI Pipeline](https://github.com/patelved007/portfolio/actions/workflows/ci.yml/badge.svg)
+
+Advanced Web Development Frameworks (ITUE301) — Portfolio Project
 
 Author: **Ved Patel (24IT080)**
 
@@ -89,3 +91,12 @@ npm run dev
 6. **Practical 6**: Full-Stack Task Management Integration
 7. **Practical 7**: JWT Authentication & Server-Side Input Validation Pipeline
 8. **Practical 8**: Performance Optimization & Lazy Loading in React
+9. **Practical 9**: In-Memory Caching (`node-cache`) and cache invalidation on writes
+10. **Practical 10**: Asynchronous processing with Node.js `EventEmitter` (`task-created` background notification)
+11. **Practical 11**: Containerization with Docker and Docker Compose (`docker-compose.yml`, multi-stage builds, named volumes, inter-container networking)
+12. **Practical 12**: CI/CD Pipeline with GitHub Actions (`.github/workflows/ci.yml`, automated Jest testing on push, build validation)
+13. **Practical 13**: AI API Integration with Graceful Degradation (`/api/ai/generate-description`, rate limiting, AI disclaimer, offline fallback)
+
+See `backend/CACHE.md` for cache keys, debug endpoint, and response-time comparison.
+
+

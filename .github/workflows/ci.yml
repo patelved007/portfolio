@@ -17,7 +17,7 @@ jobs:
         ports:
           - 27017:27017
         options: >-
-          --health-cmd mongosh
+          --health-cmd "mongosh --eval 'db.runCommand({ping:1}).ok' --quiet"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -37,25 +37,21 @@ jobs:
 
       # Step 1: Backend Dependencies & Automated Tests
       - name: Install Backend Dependencies
-        run: |
-          cd backend
-          npm install
+        working-directory: backend
+        run: npm ci
 
       - name: Run Backend Tests
+        working-directory: backend
         env:
           MONGO_URI: mongodb://127.0.0.1:27017/task-manager-test
           JWT_SECRET: ci_test_secret_key_12345
-        run: |
-          cd backend
-          npm test
+        run: npm test
 
       # Step 2: Frontend Dependencies & Production Build
       - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          npm install
+        working-directory: frontend
+        run: npm ci
 
       - name: Build Frontend Application
-        run: |
-          cd frontend
-          npm run build
+        working-directory: frontend
+        run: npm run build

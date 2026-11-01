@@ -32,7 +32,7 @@ afterAll(async () => {
 describe("Task Management API & Authentication Tests", () => {
   test("GET /tasks without authorization header returns 401", async () => {
     const res = await request(app).get("/tasks");
-    expect(res.statusCode).toBe(999); // intentionally broken for CI demo
+    expect(res.statusCode).toBe(401);
     expect(res.body).toHaveProperty("error");
   });
 

@@ -13,7 +13,7 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:latest
+        image: mongo:6
         ports:
           - 27017:27017
         options: >-
@@ -30,12 +30,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
 
-      # Step 1: Backend Dependencies & Automated Tests
+      # ── Backend ──────────────────────────────────────────
       - name: Install Backend Dependencies
         working-directory: backend
         run: npm ci
@@ -47,7 +43,7 @@ jobs:
           JWT_SECRET: ci_test_secret_key_12345
         run: npm test
 
-      # Step 2: Frontend Dependencies & Production Build
+      # ── Frontend ─────────────────────────────────────────
       - name: Install Frontend Dependencies
         working-directory: frontend
         run: npm ci
